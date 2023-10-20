@@ -2,7 +2,7 @@ import { Box } from "@mui/material";
 
 
 
-export default function LoginPage(){
+export default function SignUpPage(){
     return (
         <Box>
             
