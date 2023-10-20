@@ -1,25 +1,23 @@
 import logo from './logo.svg';
 import './App.css';
+import { BrowserRouter, Routes } from 'react-router-dom';
+import Dashboard from './components/dashboard';
+import ClubPage from './components/club';
+import LoginPage from './components/login';
+import SignUpPage from './components/signup';
+import ProfilePage from './components/profile';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          welcome 
-          
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+    <Routes>
+      <Route path="" element={<Dashboard/>} />
+      <Route path="/club" element={<ClubPage/>} />
+      <Route path="/login" element={<LoginPage/>} />
+      <Route path="/signup" element={<SignUpPage/>} />
+      <Route path="/profile" element={<ProfilePage/>} />
+    </Routes>
+    </BrowserRouter>
   );
 }
 
