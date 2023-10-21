@@ -1,8 +1,29 @@
 import { Box, Typography, TextField, Button } from "@mui/material";
+import axios from "axios";
+import { useState } from "react";
+import BackendClient from "../../BackendClient";
+
+
+
 
 
 
 export default function LoginPage() {
+
+const [file, changeFile] = useState();
+
+const onsubmit = (e) => {
+    e.preventDefault();
+    let formData = new FormData();
+    formData.append("csv_file", file);
+
+    BackendClient.post("club/upload_data_through_file/", formData).then(
+      (res) => {
+        console.log(res)
+      }
+    );
+  };
+
     return (
         <Box sx={{
             display: "flex",
@@ -65,6 +86,17 @@ export default function LoginPage() {
                     }}>
                     Log In
                 </Button>
+                <form onSubmit={onsubmit}>
+          <input
+            type="file"
+            onChange={(event) => {
+              changeFile(event.target.files[0]);
+            }}
+          ></input>
+          <input
+            type="submit"
+          />
+        </form>
                 <Button variant="outlined">Sign Up</Button>
 
             </Box>
