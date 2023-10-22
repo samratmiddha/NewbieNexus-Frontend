@@ -1,95 +1,94 @@
-import { Box, Typography, Button , TextField} from "@mui/material";
+import { Box, Typography, Button , TextField, Chip} from "@mui/material";
+import axios from "axios";
 import * as React from 'react';
-import FormControl, { useFormControl } from '@mui/material/FormControl';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import FormHelperText from '@mui/material/FormHelperText';
+import BackendClient from "../../BackendClient";
+import ClubCard from "./ClubCard";
+import ClubModal from "./ClubModal";
+import { useDispatch, useSelector } from "react-redux";
+import CheckLogin from "../../checkLogin";
 
-
-function MyFormHelperText() {
-    const { focused } = useFormControl() || {};
-
-    const helperText = React.useMemo(() => {
-        if (focused) {
-            return 'e.g. Web Development, Machine Learning, Quant etc.';
-        }
-
-        return 'Enter your interest';
-    }, [focused]);
-
-    return <FormHelperText>{helperText}</FormHelperText>;
-}
 export default function Dashboard() {
-    return (
-        <Box
-            sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                margin: "5rem",
-            }}
-        >
-            <Box
-                sx={{
-                    // justifyContent:"center",
-                    // alignSelf:"center",
-                }}
-            >
-                <Typography variant="h6" component="h2"
-                    sx={{
-                        textAlign: "center",
-                        margin: "0.5rem",
-                        // display:"flex",
-                    }}
-                >
-                    Add your interest
-                </Typography>
-                <Box
-                    sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignContent:"center",
-                    }}
-                >
-                    {/* <form
-                        style={{
-                            // height:"5px",
-                            margin:"0.5rem",
-                            
-                        }}
-                        noValidate
-                        autoComplete="off"
+    const dispatch=useDispatch()
+    const user=useSelector((state)=>state.user.id)
+    const [userIntersts,setUserInterests]=React.useState([])
+    const [clubs,setClubs]=React.useState([])
+    const [modalClub,setModalClub]=React.useState(null)
+    React.useEffect(()=>{
+        CheckLogin(dispatch)
+    },[])
+    React.useEffect(()=>{
+        BackendClient.get('clubs/').then((res)=>{
+            console.log(res.data)
+            setClubs(res.data)
+        })
+    },[])
 
-                    >
-                        <FormControl sx={{ width: '50ch' }}>
-                            <OutlinedInput />
-                            <MyFormHelperText />
-                        </FormControl>
-                    </form> */}
-                    <TextField  
-                        sx={{
-                            marginRight:"1rem",
-                            // height:"",
-                            
-                        }}
-                        id="outlined-basic" label="Enter here" variant="outlined"
-                        size="small"
-                    />
-                    <Button variant="contained" color="success"
-                        sx={{
-                            height:"45px",
-                            // marginBottom:""
-                        }}
-                    >
-                        Add
-                    </Button>
-                </Box>
-            </Box>
-            <Box
-                sx={{
-                    margin:"6rem 0",
-                }}
-            >Box 2</Box>
-            {/* <Box>Box 3</Box> */}
+    React.useEffect(()=>{
+        if(user!=null){
+        BackendClient.get('interests/get_user_interests/?user='+user).then((res)=>{
+            setUserInterests(res.data)
+        })
+    }
+    },[user])
+
+    const handleCardClick=(club)=>{
+        setModalClub(club.id);
+    }
+    const handleModalClose=()=>{
+        setModalClub(null);
+    }
+    
+
+    return (
+       <Box  sx={{display:"flex",flexDirection:"column",alignContent:"center",flexWrap:"wrap"}}>
+        <Box sx={{display:"flex",justifyContent:"center"}}>
+        <img src={require("../../assets/NewbieNexusLogo.png")} style={{width: "20rem", height:"10rem", alignSelf:"center",}}></img>     
         </Box>
+        <Box sx={{marginTop:"4rem" ,width:"40%",alignSelf:"center"}}>
+            <Box sx={{display:"flex",justifyContent:"space-between"}}>
+            <TextField sx={{width:"40rem",marginRight:"3rem"}} label="interests"></TextField>
+            <Button variant="contained" sx={{width:"8rem"}}>Add</Button>
+            </Box>
+            <Typography sx={{color:"grey"}}>For eg: Music,Machine Learing,Competitive Programming</Typography>
+            
+        </Box>
+        <Box sx={{width:"100%",textAlign:"center",marginTop:"4rem"}}>
+        <Typography variant="h3">Your interests</Typography>
+        </Box>
+        <Box sx={{display:"flex",flexWrap:"wrap"}}>
+        {userIntersts.map((data,id)=>{
+          return(
+            <Chip label={data.name}></Chip>
+          )
+        })}
+        </Box>
+        
+        <Box sx={{width:"100%",textAlign:"center",marginTop:"4rem"}}>
+        <Typography variant="h3">CLUBS</Typography>
+        </Box>
+        <Box sx={{display:"flex",justifyContent:"space-evenly",flexWrap:"wrap"}}>
+         {clubs.map((data,id)=>{
+            return(
+                <Box>
+                <ClubCard
+                club={data}
+                onClick={handleCardClick}
+                />
+                <ClubModal
+                  club={data}
+                  open={modalClub==data.id}
+                  onClose={handleModalClose}
+                />
+                </Box>
+            )
+         })}
+        </Box>
+        {/* <ClubModal
+
+         onClose={handleModalClose}
+         club={modalClub}
+
+        /> */}
+       </Box>
     )
 }

@@ -1,5 +1,4 @@
 import { Box, Typography, TextField, Button } from "@mui/material";
-import axios from "axios";
 import { useState } from "react";
 import BackendClient from "../../BackendClient";
 
@@ -10,19 +9,15 @@ import BackendClient from "../../BackendClient";
 
 export default function LoginPage() {
 
-const [file, changeFile] = useState();
+    const [username,setUsername]=useState("")
+    const [password,setPassword]=useState("")
 
-const onsubmit = (e) => {
-    e.preventDefault();
-    let formData = new FormData();
-    formData.append("csv_file", file);
-
-    BackendClient.post("club/upload_data_through_file/", formData).then(
-      (res) => {
-        console.log(res)
-      }
-    );
-  };
+    const onSubmit=()=>{
+        BackendClient.post('login/',{
+            username:username,
+            password:password,
+        })
+    }
 
     return (
         <Box sx={{
@@ -64,10 +59,13 @@ const onsubmit = (e) => {
                 </Typography>
                 <TextField
                     id="outlined-basic"
-                    label="Enrollment Number"
+                    label="Username"
                     variant="outlined"
                     sx={{
                         marginBottom: "0.5rem",
+                    }}
+                    onChange={(e)=>{
+                        setUsername(e.target.value)
                     }}
                 />
                 <TextField
@@ -78,25 +76,20 @@ const onsubmit = (e) => {
                     sx={{
                         marginBottom: "0.5rem",
                     }}
+                    onChange={(e)=>{
+                        setPassword(e.target.value)
+                    }}
                 />
                 <Button variant="contained"
                     sx={{
 
                         marginBottom: "0.5rem",
-                    }}>
+                    }}
+                    onClick={onSubmit}
+                    >
+                    
                     Log In
                 </Button>
-                <form onSubmit={onsubmit}>
-          <input
-            type="file"
-            onChange={(event) => {
-              changeFile(event.target.files[0]);
-            }}
-          ></input>
-          <input
-            type="submit"
-          />
-        </form>
                 <Button variant="outlined">Sign Up</Button>
 
             </Box>
