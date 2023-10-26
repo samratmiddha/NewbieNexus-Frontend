@@ -8,7 +8,7 @@ import { CardActionArea } from '@mui/material';
 
 export default function ClubCard(props){
     return (
-        <Card sx={{ width: "20rem",margin:"3rem" }}>
+        <Card sx={{ width: "20rem",margin:"3rem" ,height:"25rem" }}>
         <CardActionArea sx={{display:"flex",flexDirection:"column",justifyContent:"space-between",height:"100%"}} onClick={()=>{
           props.onClick(props.club)
         }}>
