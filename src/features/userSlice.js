@@ -20,8 +20,11 @@ export const userSlice = createSlice({
         state.interests=action.payload.interests
         state.id=action.payload.id
       },
+      setUserInterests: (state,action)=>{
+        state.interests=action.payload
+      }
     },
   });
   
-  export const { setUserData } = userSlice.actions;
+  export const { setUserData,setUserInterests } = userSlice.actions;
   export default userSlice.reducer;

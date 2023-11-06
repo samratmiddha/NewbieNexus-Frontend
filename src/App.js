@@ -5,9 +5,18 @@ import Dashboard from './components/dashboard';
 import LoginPage from './components/login';
 import SignUpPage from './components/signup';
 import ProfilePage from './components/profile';
+import themes from "./theme"
+import { ThemeProvider,createTheme } from '@mui/material';
+
+const theme =createTheme(
+    {palette:themes["light"]},
+  )
+
+
 
 function App() {
   return (
+    <ThemeProvider theme={theme}>
     <BrowserRouter>
     <Routes>
       <Route path="" element={<Dashboard/>} />
@@ -16,6 +25,7 @@ function App() {
       <Route path="/profile" element={<ProfilePage/>} />
     </Routes>
     </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

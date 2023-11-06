@@ -1,4 +1,4 @@
-import { Box, Typography, Button, TextField, Chip } from "@mui/material";
+import { Box, Typography, Button, TextField, Chip, Avatar } from "@mui/material";
 import axios from "axios";
 import * as React from 'react';
 import BackendClient from "../../BackendClient";
@@ -6,13 +6,15 @@ import ClubCard from "./ClubCard";
 import ClubModal from "./ClubModal";
 import { useDispatch, useSelector } from "react-redux";
 import CheckLogin from "../../checkLogin";
-import AddCircleIcon from '@mui/icons-material/AddCircle';
 import ClubRecommendation from "./ClubRecommendation";
+import illustration from "../../assets/illustration.svg"
+import { setUserInterests } from "../../features/userSlice";
+import { INTEREST_GROUPS } from "../../constants";
+import InterestList from "./InterestList";
 
 export default function Dashboard() {
     const dispatch = useDispatch()
     const user = useSelector((state) => state.user.id)
-    const [userIntersts, setUserInterests] = React.useState([])
     const [clubs, setClubs] = React.useState([])
     const [modalClub, setModalClub] = React.useState(null)
     const [clubRecommendationModalOpen,setclubRecommendationModalOpen]=React.useState(false)
@@ -22,8 +24,8 @@ export default function Dashboard() {
     }, [])
 
     const getUserInterests=()=>{
-        BackendClient.get('interests/get_all_interests/?user=' + user).then((res) => {
-            setUserInterests(res.data)
+        BackendClient.get('interests/get_user_interests/?user=' + user).then((res) => {
+            dispatch(setUserInterests(res.data))
         })
     }
     React.useEffect(() => {
@@ -62,53 +64,30 @@ export default function Dashboard() {
             getUserInterests()
         })
     }
+
+    const handleLogout = ()=>{
+        BackendClient.get('logout/').then((res)=>{
+            window.location.href="http://localhost:3000/login"
+        })
+    }
     
 
 
-    const handleUserInterestClick=(id)=>{
-        BackendClient.delete('interests/'+userIntersts[id].id+'/').then((res)=>{
-            setUserInterests((state)=>{
-                const obj=[...state]
-                obj[id].user_interest=false
-                return obj
-                
-            })
-        })
-       
-
-    }
-    const handleInterestClick=(id)=>{
-        BackendClient.post('interests/',{
-            is_user_interest:true,
-            name:userIntersts[id].name,
-            user:user,
-            club:null,
-            weight:2,
-
-
-        }).then((res)=>{
-            setUserInterests((state)=>{
-                const obj=[...state]
-                obj[id].user_interest=true
-                return obj
-                
-            })
-        })
-    }
-    React.useEffect(()=>{
-       console.log("userInterest changed")
-    },[userIntersts])
 
 
     return (
-        <Box sx={{ display: "flex", flexDirection: "column", alignContent: "center", flexWrap: "wrap" }}>
-            <Box sx={{ display: "flex", justifyContent: "center" }}>
-                <img src={require("../../assets/NewbieNexusLogo.png")} style={{ width: "20rem", height: "10rem", alignSelf: "center", }}></img>
+        <div style={{ display: "flex", flexDirection: "column", alignContent: "center", flexWrap: "wrap", backgroundImage:`linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)),url(${illustration})`,backgroundRepeat:"no-repeat",backgroundPosition:"center",backgroundAttachment:"fixed",backgroundSize:"50%",}}>
+            <Box sx={{ display: "flex", justifyContent: "space-between",padding:"2rem" }}>
+                <img src={require("../../assets/logo.png")} style={{ width: "15rem" }}></img>
+                <Box sx={{display:"flex",alignContent:"center"}}>
+                   <Avatar sx={{alignSelf:"center",width:"3rem",height:"3rem"}}></Avatar>
+                   <Button variant="contained"  sx={{height:"3rem",marginLeft:"2rem",width:"10rem",alignSelf:"center"}} onClick={handleLogout}>Logout</Button>
+                </Box>
             </Box>
             <Box sx={{ marginTop: "4rem", width: "40%", alignSelf: "center" }}>
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                    <TextField sx={{ width: "40rem", marginRight: "3rem" }} label="interests" onChange={handleAddInterestsChange}></TextField>
-                    <Button variant="contained" sx={{ width: "8rem" }} onClick={handleAddInterestsSubmit}>Add</Button>
+                    <TextField sx={{ width: "80%" }} label="interests" onChange={handleAddInterestsChange}></TextField>
+                    <Button variant="contained" sx={{ width: "15%" }} onClick={handleAddInterestsSubmit}>Add</Button>
                 </Box>
                 <Typography sx={{ color: "grey" }}>For eg: Music,Machine Learing,Competitive Programming</Typography>
                 <Button variant="contained" onClick={handleClubRecommendationModalOpen}sx={{ width: "100%",marginTop:"2rem",height:"3.2rem" }}>Get Club Recommendations</Button>
@@ -118,58 +97,15 @@ export default function Dashboard() {
              onClose={handleClubRecommendationModalClose}
 
             />
-            <Box sx={{ width: "100%", textAlign: "center", marginTop: "4rem" }}>
-                <Typography variant="h3">Your interests</Typography>
-            </Box>
-            <Box sx={{ display: "flex", flexWrap: "wrap", width: "70%", alignSelf: "center", justifyContent: "center" }}>
-                {userIntersts.map((data, id) => {
-                    return data.user_interest ? (
-                        <Chip
-                            label={data.name}
-                            color="secondary"
-                            onClick={()=>{
-                                handleUserInterestClick(id)
-                            }}
-                            onDelete={()=>{
-                                handleUserInterestClick(id)
-                            }}
-                            sx={{ 
-                            minWidth: "8rem", 
-                            height: "2.5rem", 
-                            fontSize: "1rem", 
-                            margin: "1rem",
-                            borderRadius:"1.25rem",
-                            display:"flex",
-                            justifyContent:"space-between"
-                            }}>
-
-                            </Chip>
-                    ) :
-                        (
-                            <Chip 
-                            label={data.name} 
-                            color="primary"
-
-                            onClick={()=>{
-                                handleInterestClick(id)
-                            }}
-                            onDelete={()=>{
-                                handleInterestClick(id)
-                            }}
-                            deleteIcon={<AddCircleIcon/>}
-                            sx={{ 
-                            minWidth: "8rem", 
-                            height: "2.5rem", 
-                            fontSize: "1rem", 
-                            margin: "1rem",
-                            borderRadius:"1.25rem",
-                            display:"flex",
-                            justifyContent:"space-between"
-                            }}>
-
-                            </Chip>
-                        )
-                })}
+            <Box sx={{ display: "flex", flexWrap: "wrap", width: "100%", alignSelf: "center", justifyContent: "center" ,flexDirection:"column",marginTop:"4rem"}}>
+              {Object.keys(INTEREST_GROUPS).map((key)=>{
+                   return(
+                    <InterestList
+                    name={key}
+                    interests={INTEREST_GROUPS[key]}
+                    ></InterestList>
+                   )
+              })}
             </Box>
 
             <Box sx={{ width: "100%", textAlign: "center", marginTop: "4rem" }}>
@@ -192,6 +128,6 @@ export default function Dashboard() {
                     )
                 })}
             </Box>
-        </Box>
+        </div>
     )
 }
